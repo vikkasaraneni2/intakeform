@@ -2,14 +2,8 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-type Params = { id: string };
-
-export default async function IntakeDetail({ params }: { params: Params | Promise<Params> }) {
-  function isPromise<T>(value: unknown): value is Promise<T> {
-    return typeof (value as { then?: unknown }).then === "function";
-  }
-  const p = isPromise<Params>(params) ? await params : (params as Params);
-  const { id } = p;
+export default async function IntakeDetail({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const i = await prisma.intake.findUnique({ where: { id } });
   if (!i) return <div>Not found</div>;
   return (
