@@ -15,8 +15,9 @@ function buildWhere(q?: string) {
   };
 }
 
-export default async function IntakesPage({ searchParams }: { searchParams?: { q?: string } }) {
-  const q = searchParams?.q || "";
+export default async function IntakesPage({ searchParams }: { searchParams?: Promise<{ q?: string }> }) {
+  const sp = searchParams ? await searchParams : undefined;
+  const q = sp?.q || "";
   const intakes = await prisma.intake.findMany({ where: buildWhere(q), orderBy: { createdAt: "desc" } });
   return (
     <div className="space-y-4 p-4">
