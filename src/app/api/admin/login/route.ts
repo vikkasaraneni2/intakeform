@@ -8,7 +8,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid token" }, { status: 401 });
   }
   const res = NextResponse.json({ ok: true });
-  res.cookies.set("admin_token", token, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: 60 * 60 * 24 * 30 });
+  // Session-only cookie (no maxAge) so the browser asks each new session
+  res.cookies.set("admin_token", token, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/" });
   return res;
 }
 
