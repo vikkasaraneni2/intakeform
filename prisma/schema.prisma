@@ -1,0 +1,137 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum IntakeStatus {
+  NEW
+  SCHEDULED
+  COMPLETED
+  CANCELED
+}
+
+enum VisitType {
+  WALKTHROUGH_V1
+}
+
+enum ActivityType {
+  page_view
+  intake_submitted
+  schedule_booked
+}
+
+model Account {
+  id             String    @id @default(cuid())
+  name           String
+  domain         String?
+  createdAt      DateTime  @default(now())
+  lastActivityAt DateTime?
+  intakeCount    Int       @default(0)
+  visitCount     Int       @default(0)
+  bookedCount    Int       @default(0)
+  contacts       Contact[]
+  intakes        Intake[]
+  activities     Activity[]
+}
+
+model Contact {
+  id        String   @id @default(cuid())
+  account   Account  @relation(fields: [accountId], references: [id])
+  accountId String
+  name      String
+  email     String   @unique
+  phone     String?
+  role      String?
+  createdAt DateTime @default(now())
+  intakes   Intake[]
+  activities Activity[]
+}
+
+model Intake {
+  id              String        @id @default(cuid())
+  account         Account       @relation(fields: [accountId], references: [id])
+  accountId       String
+  contact         Contact       @relation(fields: [contactId], references: [id])
+  contactId       String
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  status          IntakeStatus  @default(NEW)
+  scheduledAt     DateTime?
+  company         String
+  contactName     String
+  email           String
+  phone           String?
+  siteAddress     String
+  siteHours       String?
+  roofAccess      String?
+  accessNotes     String?
+  recentOutages   String?
+  brokerContact   String?
+  ppeRequired     Boolean?
+  escortRequired  Boolean?
+  photoPermission Boolean?
+  notes           String?
+  source          String?
+  leadScore       String?
+  visits          Visit[]
+  activities      Activity[]
+
+  @@index([company])
+  @@index([createdAt])
+}
+
+model Visit {
+  id          String     @id @default(cuid())
+  intake      Intake     @relation(fields: [intakeId], references: [id])
+  intakeId    String
+  type        VisitType
+  scheduledAt DateTime
+  completedAt DateTime?
+  assignee    String?
+  notes       String?
+  slot        AvailabilitySlot? @relation(fields: [slotId], references: [id])
+  slotId      String?
+}
+
+model Activity {
+  id          String       @id @default(cuid())
+  ts          DateTime     @default(now())
+  sessionId   String
+  type        ActivityType
+  path        String
+  referrer    String?
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  ua          String?
+  ipHash      String?
+  account     Account?     @relation(fields: [accountId], references: [id])
+  accountId   String?
+  contact     Contact?     @relation(fields: [contactId], references: [id])
+  contactId   String?
+  intake      Intake?      @relation(fields: [intakeId], references: [id])
+  intakeId    String?
+  @@index([type, ts])
+  @@index([sessionId])
+}
+
+model AvailabilitySlot {
+  id          String   @id @default(cuid())
+  startTime   DateTime
+  endTime     DateTime
+  capacity    Int      @default(1)
+  bookedCount Int      @default(0)
+  isActive    Boolean  @default(true)
+  visits      Visit[]
+  @@index([startTime])
+}
