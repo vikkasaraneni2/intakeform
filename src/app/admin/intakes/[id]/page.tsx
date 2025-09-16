@@ -2,8 +2,11 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-export default async function IntakeDetail({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+type Params = { id: string };
+
+export default async function IntakeDetail({ params }: { params: Params | Promise<Params> }) {
+  const p = (typeof (params as any)?.then === "function") ? await (params as Promise<Params>) : (params as Params);
+  const { id } = p;
   const i = await prisma.intake.findUnique({ where: { id } });
   if (!i) return <div>Not found</div>;
   return (
