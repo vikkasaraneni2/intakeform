@@ -12,7 +12,9 @@ export async function GET(_req: Request, ctx: { params: Promise<{ intakeId: stri
 
   const doc = ProposalPDF({ intake, proposal: prop });
   const file = await pdf(doc).toBuffer();
-  return new NextResponse(file, { headers: { "Content-Type": "application/pdf", "Cache-Control": "no-store" } });
+  return new Response(file, { headers: { "Content-Type": "application/pdf", "Cache-Control": "no-store" } });
 }
+
+export const runtime = 'nodejs';
 
 
