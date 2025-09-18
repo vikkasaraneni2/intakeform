@@ -14,11 +14,16 @@ export async function GET(_req: Request, ctx: { params: Promise<{ intakeId: stri
   const logoUrl = `${base}/cec-logo.png`;
   const doc = ProposalPDF({ intake, proposal: prop, logoUrl });
   // Render to Buffer and return as ArrayBuffer to satisfy BodyInit in Node
-  // Use @react-pdf's pdf().toBuffer() in Node runtime and return as Blob to satisfy BodyInit
+  // Use @react-pdf's pdf().toBuffer() in Node runtime and return raw bytes
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const buf = await (pdf(doc) as any).toBuffer();
-  const blob = new Blob([buf], { type: "application/pdf" });
-  return new Response(blob, { headers: { "Content-Type": "application/pdf", "Cache-Control": "no-store" } });
+  return new Response(buf as unknown as BodyInit, {
+    headers: {
+      "Content-Type": "application/pdf",
+      "Cache-Control": "no-store",
+      "Content-Disposition": "attachment; filename=proposal.pdf",
+    },
+  });
 }
 
 export const runtime = 'nodejs';
