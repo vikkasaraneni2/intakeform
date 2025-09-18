@@ -1,8 +1,10 @@
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/adminGuard";
 
 export const dynamic = "force-dynamic";
 
 export default async function IntakeDetail({ params }: { params: Promise<{ id: string }> }) {
+  await requireAdmin();
   const { id } = await params;
   const i = await prisma.intake.findUnique({ where: { id } });
   if (!i) return <div>Not found</div>;

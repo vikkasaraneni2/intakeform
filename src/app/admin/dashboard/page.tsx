@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/adminGuard";
 import { endOfDay, startOfDay, subDays } from "date-fns";
 
 async function getMetrics() {
@@ -46,6 +47,7 @@ async function getMetrics() {
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
+  await requireAdmin();
   const data = await getMetrics();
   return (
     <div className="space-y-6 p-4">
@@ -139,6 +141,7 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
     <div className="rounded-xl border bg-white p-4 shadow-sm"><h2 className="mb-3 text-lg font-medium">{title}</h2>{children}</div>
   );
 }
+
 
 
 

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { requireAdmin } from "@/lib/adminGuard";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -16,6 +17,7 @@ function buildWhere(q?: string) {
 }
 
 export default async function IntakesPage({ searchParams }: { searchParams?: Promise<{ q?: string }> }) {
+  await requireAdmin();
   const sp = searchParams ? await searchParams : undefined;
   const q = sp?.q || "";
   const intakes = await prisma.intake.findMany({ where: buildWhere(q), orderBy: { createdAt: "desc" } });
