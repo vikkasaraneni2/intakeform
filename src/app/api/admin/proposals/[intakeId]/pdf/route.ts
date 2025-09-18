@@ -11,7 +11,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ intakeId: stri
   const prop = await prisma.proposal.findFirst({ where: { intakeId }, orderBy: { version: "desc" } });
   if (!intake || !est || !prop) return NextResponse.json({ error: "Missing data" }, { status: 404 });
 
-  const doc = ProposalPDF({ intake, estimate: est, proposal: prop });
+  const doc = ProposalPDF({ intake, proposal: prop });
   const file = await pdf(doc).toBuffer();
 
   // Optional: store and persist URL
