@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import ReactPDF from "@react-pdf/renderer";
+import { pdf } from "@react-pdf/renderer";
 import ProposalPDF from "@/lib/proposal/pdfDoc";
 
 export async function GET(_req: Request, ctx: { params: Promise<{ intakeId: string }> }) {
@@ -14,8 +14,10 @@ export async function GET(_req: Request, ctx: { params: Promise<{ intakeId: stri
   const logoUrl = `${base}/cec-logo.png`;
   const doc = ProposalPDF({ intake, proposal: prop, logoUrl });
   // Render to Buffer and return as ArrayBuffer to satisfy BodyInit in Node
-  const buf = await ReactPDF.renderToBuffer(doc);
-  const u8 = new Uint8Array(buf);
+  // Use @react-pdf's pdf().toBuffer() in Node runtime.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const buf = await (pdf(doc) as any).toBuffer();
+  const u8 = new Uint8Array(buf as ArrayBufferLike);
   return new Response(u8, { headers: { "Content-Type": "application/pdf", "Cache-Control": "no-store" } });
 }
 
