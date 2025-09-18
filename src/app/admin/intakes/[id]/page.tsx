@@ -31,7 +31,7 @@ export default async function IntakeDetail({ params }: { params: Promise<{ id: s
       </div>
       <div>
         <h2 className="mb-2 text-lg font-medium">Proposal</h2>
-        <ProposalEditor intakeId={params.id} />
+        <ProposalEditor intakeId={id} />
       </div>
     </div>
   );
