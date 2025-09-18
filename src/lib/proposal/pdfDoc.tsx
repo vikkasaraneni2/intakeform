@@ -28,7 +28,7 @@ export default function ProposalPDF({ intake, proposal }: ProposalDocProps) {
     <Document>
       <Page size="LETTER" style={styles.page}>
         <View style={styles.header}>
-          <Image style={styles.logo} src="/cec-logo.png" alt="CEC" />
+          <Image style={styles.logo} src="/cec-logo.png" />
           <View>
             <Text>Proposal #{proposal.proposalNo}</Text>
             <Text>{new Date().toLocaleDateString()}</Text>
