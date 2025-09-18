@@ -10,7 +10,9 @@ export async function GET(_req: Request, ctx: { params: Promise<{ intakeId: stri
   const prop = await prisma.proposal.findFirst({ where: { intakeId }, orderBy: { version: "desc" } });
   if (!intake || !est || !prop) return NextResponse.json({ error: "Missing data" }, { status: 404 });
 
-  const doc = ProposalPDF({ intake, proposal: prop });
+  const base = (process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000').replace(/\/$/, '');
+  const logoUrl = `${base}/cec-logo.png`;
+  const doc = ProposalPDF({ intake, proposal: prop, logoUrl });
   // Render to Buffer and return as ArrayBuffer to satisfy BodyInit in Node
   const buf = await ReactPDF.renderToBuffer(doc);
   const u8 = new Uint8Array(buf);

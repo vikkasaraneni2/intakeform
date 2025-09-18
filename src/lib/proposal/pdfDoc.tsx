@@ -15,9 +15,10 @@ const styles = StyleSheet.create({
 type ProposalDocProps = {
   intake: { company: string; siteAddress: string; contactName: string; email: string; phone?: string | null };
   proposal: { proposalNo: string; total?: number | null };
+  logoUrl: string;
 };
 
-export default function ProposalPDF({ intake, proposal }: ProposalDocProps) {
+export default function ProposalPDF({ intake, proposal, logoUrl }: ProposalDocProps) {
   const client = {
     name: intake.company,
     address: intake.siteAddress,
@@ -28,7 +29,7 @@ export default function ProposalPDF({ intake, proposal }: ProposalDocProps) {
     <Document>
       <Page size="LETTER" style={styles.page}>
         <View style={styles.header}>
-          <Image style={styles.logo} src="/cec-logo.png" />
+          <Image style={styles.logo} src={logoUrl} />
           <View>
             <Text>Proposal #{proposal.proposalNo}</Text>
             <Text>{new Date().toLocaleDateString()}</Text>
