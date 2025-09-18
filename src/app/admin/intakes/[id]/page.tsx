@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/adminGuard";
+import ProposalEditor from "@/components/ProposalEditor";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +28,10 @@ export default async function IntakeDetail({ params }: { params: Promise<{ id: s
         <Field label="Notes" value={i.notes || "—"} />
         <Field label="Created" value={i.createdAt.toLocaleString()} />
         <Field label="Updated" value={i.updatedAt.toLocaleString()} />
+      </div>
+      <div>
+        <h2 className="mb-2 text-lg font-medium">Proposal</h2>
+        <ProposalEditor intakeId={params.id} />
       </div>
     </div>
   );

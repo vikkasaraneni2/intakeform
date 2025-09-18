@@ -3,3 +3,4 @@ export default function AdminIndex() { redirect("/admin/intakes"); }
 
 
 
+

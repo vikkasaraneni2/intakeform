@@ -13,7 +13,8 @@ function LoginInner() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    const res = await fetch("/api/admin/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token }) });
+    const csrf = getCsrf();
+    const res = await fetch("/api/admin/login", { method: "POST", headers: { "Content-Type": "application/json", "x-csrf-token": csrf || "" }, body: JSON.stringify({ token }) });
     if (!res.ok) {
       const j = await res.json();
       setError(j?.error || "Login failed");
@@ -33,6 +34,11 @@ function LoginInner() {
       </form>
     </div>
   );
+}
+
+function getCsrf() {
+  const m = document.cookie.match(/(?:^|; )csrf_token=([^;]+)/);
+  return m ? decodeURIComponent(m[1]) : "";
 }
 
 export default function AdminLoginPage() {

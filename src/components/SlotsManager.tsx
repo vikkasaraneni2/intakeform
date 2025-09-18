@@ -20,7 +20,8 @@ export default function SlotsManager() {
 
   async function createSlot(e: React.FormEvent) {
     e.preventDefault();
-    await fetch("/api/admin/slots", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ startTime: start, endTime: end, capacity }) });
+    const csrf = getCsrf();
+    await fetch("/api/admin/slots", { method: "POST", headers: { "Content-Type": "application/json", "x-csrf-token": csrf || "" }, body: JSON.stringify({ startTime: start, endTime: end, capacity }) });
     setStart("");
     setEnd("");
     setCapacity(1);
@@ -28,12 +29,14 @@ export default function SlotsManager() {
   }
 
   async function toggleActive(id: string, isActive: boolean) {
-    await fetch("/api/admin/slots", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, isActive: !isActive }) });
+    const csrf = getCsrf();
+    await fetch("/api/admin/slots", { method: "PATCH", headers: { "Content-Type": "application/json", "x-csrf-token": csrf || "" }, body: JSON.stringify({ id, isActive: !isActive }) });
     refresh();
   }
 
   async function removeSlot(id: string) {
-    await fetch(`/api/admin/slots?id=${id}`, { method: "DELETE" });
+    const csrf = getCsrf();
+    await fetch(`/api/admin/slots?id=${id}`, { method: "DELETE", headers: { "x-csrf-token": csrf || "" } });
     refresh();
   }
 
@@ -78,6 +81,12 @@ export default function SlotsManager() {
     </div>
   );
 }
+
+function getCsrf() {
+  const m = document.cookie.match(/(?:^|; )csrf_token=([^;]+)/);
+  return m ? decodeURIComponent(m[1]) : "";
+}
+
 
 
 

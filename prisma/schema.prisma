@@ -85,6 +85,8 @@ model Intake {
   leadScore       String?
   visits          Visit[]
   activities      Activity[]
+  proposals       Proposal[]
+  equipmentEstimate EquipmentEstimate?
 
   @@index([company])
   @@index([createdAt])
@@ -134,4 +136,58 @@ model AvailabilitySlot {
   isActive    Boolean  @default(true)
   visits      Visit[]
   @@index([startTime])
+}
+
+// Proposals: pricing + documents generated per intake
+model Proposal {
+  id           String   @id @default(cuid())
+  intake       Intake   @relation(fields: [intakeId], references: [id])
+  intakeId     String
+  proposalNo   String
+  version      Int      @default(1)
+  status       String   @default("DRAFT")
+  currency     String   @default("USD")
+  subtotal     Float    @default(0)
+  tax          Float    @default(0)
+  total        Float    @default(0)
+  pdfUrl       String?
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([intakeId, version])
+  @@index([proposalNo])
+}
+
+// Estimation inputs per intake (editable in admin)
+model EquipmentEstimate {
+  id                 String   @id @default(cuid())
+  intake             Intake   @relation(fields: [intakeId], references: [id])
+  intakeId           String   @unique
+  panels100A         Int      @default(0)
+  panels200A         Int      @default(0)
+  transformers45_75  Int      @default(0)
+  switchgear2000A    Int      @default(0)
+  customJson         String?  // JSON string for custom line items
+  reportOverheadPct  Float    @default(0.30)
+  mobilizationHours  Float    @default(2)
+  blendedRatePerHour Float    @default(190.6)
+  computedHours      Float    @default(0)
+  computedPrice      Float    @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+// Default coefficients (single row)
+model PricingCoefficients {
+  id                 Int     @id @default(1)
+  panel100AHours     Float   @default(0.75)
+  panel200AHours     Float   @default(1.0)
+  transformer45_75H  Float   @default(0.5)
+  switchgear2000AH   Float   @default(4.0)
+  reportOverheadPct  Float   @default(0.30)
+  mobilizationHours  Float   @default(2.0)
+  workdayHours       Int     @default(8)
+
+  @@map("pricing_coefficients")
 }
