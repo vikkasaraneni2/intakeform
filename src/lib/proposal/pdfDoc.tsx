@@ -12,9 +12,12 @@ const styles = StyleSheet.create({
   footer: { position: "absolute", bottom: 24, left: 32, right: 32, fontSize: 10, color: "#555" },
 });
 
-type ProposalDocProps = { intake: any; estimate: any; proposal: any };
+type ProposalDocProps = {
+  intake: { company: string; siteAddress: string; contactName: string; email: string; phone?: string | null };
+  proposal: { proposalNo: string; total?: number | null };
+};
 
-export default function ProposalPDF({ intake, estimate, proposal }: ProposalDocProps) {
+export default function ProposalPDF({ intake, proposal }: ProposalDocProps) {
   const client = {
     name: intake.company,
     address: intake.siteAddress,
