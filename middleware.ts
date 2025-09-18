@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const isAdminPath = pathname.startsWith("/admin");
   const isAdminLogin = pathname.startsWith("/admin/login");
@@ -39,7 +39,7 @@ export function middleware(req: NextRequest) {
 
   // Admin auth: verify JWT
   if ((isAdminPath && !isAdminLogin) || (isAdminApi && !isAdminLoginApi)) {
-    const ok = jwt && secret ? verifyJwtEdge(jwt, secret) : null;
+    const ok = jwt && secret ? await verifyJwtEdge(jwt, secret) : null;
     if (!ok) {
       if (isAdminApi) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers: res.headers });
@@ -145,7 +145,7 @@ function parseJwtPayload(token: string): { payload?: any; sigInput?: string; sig
   }
 }
 
-function verifyJwtEdge(token: string, secret: string): boolean {
+async function verifyJwtEdge(token: string, secret: string): Promise<boolean> {
   const { payload, sigInput, sig } = parseJwtPayload(token);
   if (!payload || !sigInput || !sig) return false;
   const exp = payload.exp ? Number(payload.exp) : 0;
@@ -153,21 +153,20 @@ function verifyJwtEdge(token: string, secret: string): boolean {
   const key = textToUint8Array(secret);
   const data = textToUint8Array(sigInput);
   const sigBytes = base64UrlToUint8Array(sig);
-  // HMAC-SHA-256 verify via subtle
-  // Note: Edge runtime supports crypto.subtle
-  // We do synchronous-like verify by signing and comparing
-  // (WebCrypto verify for HMAC is not widely supported to compare directly with raw bytes)
-  // So we compute signature as sign and compare
-  const subtle = crypto.subtle;
-  // @ts-ignore - subtle types in edge
-  return (subtle.importKey("raw", key, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]) as Promise<CryptoKey>)
-    .then((cryptoKey) => subtle.sign("HMAC", cryptoKey, data) as Promise<ArrayBuffer>)
-    .then((ab) => {
-      const computed = new Uint8Array(ab);
-      return timingSafeEqual(computed, sigBytes);
-    })
-    // Fallback deny on any error
-    .catch(() => false) as unknown as boolean;
+  try {
+    const cryptoKey = await crypto.subtle.importKey(
+      "raw",
+      key,
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["sign"]
+    );
+    const ab = await crypto.subtle.sign("HMAC", cryptoKey, data.buffer as ArrayBuffer);
+    const computed = new Uint8Array(ab);
+    return timingSafeEqual(computed, sigBytes);
+  } catch {
+    return false;
+  }
 }
 
 
