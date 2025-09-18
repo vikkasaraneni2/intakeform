@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { verifyJwt } from "@/lib/jwt";
 
 export async function requireAdmin() {
-  const c = cookies();
+  const c = await cookies();
   const token = c.get("admin_session")?.value;
   const secret = process.env.SESSION_SECRET || "";
   if (!token || !secret) redirect("/admin/login");
