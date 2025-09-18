@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { signJwt } from "@/lib/jwt";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -7,10 +8,17 @@ export async function POST(req: NextRequest) {
   if (!token || token !== expected) {
     return NextResponse.json({ error: "Invalid token" }, { status: 401 });
   }
+  const secret = process.env.SESSION_SECRET || cryptoRandom();
+  const exp = Math.floor(Date.now() / 1000) + 60 * 60; // 60 minutes
+  const jwt = signJwt({ sub: "admin", role: "admin", iat: Math.floor(Date.now() / 1000), exp }, secret);
   const res = NextResponse.json({ ok: true });
-  // Session-only cookie (no maxAge) so the browser asks each new session
-  res.cookies.set("admin_token", token, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/" });
+  res.cookies.set("admin_session", jwt, { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/" });
   return res;
+}
+
+function cryptoRandom() {
+  // Non-cryptographic fallback for missing SESSION_SECRET in dev
+  return Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
 }
 
 
