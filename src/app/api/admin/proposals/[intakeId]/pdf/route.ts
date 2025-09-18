@@ -14,11 +14,11 @@ export async function GET(_req: Request, ctx: { params: Promise<{ intakeId: stri
   const logoUrl = `${base}/cec-logo.png`;
   const doc = ProposalPDF({ intake, proposal: prop, logoUrl });
   // Render to Buffer and return as ArrayBuffer to satisfy BodyInit in Node
-  // Use @react-pdf's pdf().toBuffer() in Node runtime.
+  // Use @react-pdf's pdf().toBuffer() in Node runtime and return as Blob to satisfy BodyInit
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const buf = await (pdf(doc) as any).toBuffer();
-  const u8 = new Uint8Array(buf as ArrayBufferLike);
-  return new Response(u8, { headers: { "Content-Type": "application/pdf", "Cache-Control": "no-store" } });
+  const blob = new Blob([buf], { type: "application/pdf" });
+  return new Response(blob, { headers: { "Content-Type": "application/pdf", "Cache-Control": "no-store" } });
 }
 
 export const runtime = 'nodejs';
