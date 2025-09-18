@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { pdf } from "@react-pdf/renderer";
+import ReactPDF, { pdf } from "@react-pdf/renderer";
 import ProposalPDF from "@/lib/proposal/pdfDoc";
 
 export async function GET(_req: Request, ctx: { params: Promise<{ intakeId: string }> }) {
@@ -11,11 +11,9 @@ export async function GET(_req: Request, ctx: { params: Promise<{ intakeId: stri
   if (!intake || !est || !prop) return NextResponse.json({ error: "Missing data" }, { status: 404 });
 
   const doc = ProposalPDF({ intake, proposal: prop });
-  // Get a typed buffer and convert to ArrayBuffer for Response BodyInit
-  const out = pdf(doc) as { toBuffer(): Promise<Uint8Array> };
-  const buf = await out.toBuffer();
-  const ab = buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
-  return new Response(ab, { headers: { "Content-Type": "application/pdf", "Cache-Control": "no-store" } });
+  // Prefer stream to avoid Node/Edge buffer typing mismatches
+  const stream = await ReactPDF.renderToStream(doc);
+  return new Response(stream, { headers: { "Content-Type": "application/pdf", "Cache-Control": "no-store" } });
 }
 
 export const runtime = 'nodejs';
