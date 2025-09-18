@@ -1,20 +1,33 @@
 import React from "react";
-import { Document, Page, StyleSheet, Text, View, Image } from "@react-pdf/renderer";
+import { Document, Page, StyleSheet, Text, View, Image, Font } from "@react-pdf/renderer";
+
+// Optional Georgia font registration (server-side). Provide URL in PDF_GEORGIA_URL or NEXT_PUBLIC_PDF_GEORGIA_URL
+const georgiaUrl = process.env.PDF_GEORGIA_URL || process.env.NEXT_PUBLIC_PDF_GEORGIA_URL;
+if (georgiaUrl) {
+  try {
+    Font.register({ family: "Georgia", src: georgiaUrl });
+  } catch {
+    // ignore font registration errors; fallback will be used
+  }
+}
+
+const BASE_FONT = georgiaUrl ? "Georgia" : "Times-Roman";
+const BOLD_FONT = georgiaUrl ? "Georgia" : "Times-Bold";
 
 const styles = StyleSheet.create({
-  page: { padding: 32, fontSize: 10 },
+  page: { padding: 32, fontSize: 10, fontFamily: BASE_FONT },
   header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 },
   logo: { width: 160 },
   companyName: { fontSize: 14, marginBottom: 2 },
-  smallGap: { marginTop: 4 },
+  smallGap: { marginTop: 6 },
   refLine: { marginTop: 16, marginBottom: 12, fontSize: 11 },
   greeting: { marginBottom: 8 },
   intro: { marginBottom: 10 },
-  sectionTitle: { fontSize: 11, marginTop: 12, marginBottom: 6, fontWeight: 700, marginLeft: 12 },
+  sectionTitle: { fontSize: 11, marginTop: 12, marginBottom: 6, marginLeft: 12, fontFamily: BOLD_FONT },
   bullet: { marginLeft: 24, marginBottom: 3 },
   costRow: { flexDirection: "row", alignItems: "center", marginTop: 12, marginBottom: 10 },
   costLabel: { fontSize: 11 },
-  costDots: { flexGrow: 1, textAlign: "center", marginHorizontal: 8 },
+  dashedLine: { flexGrow: 1, borderBottom: 1, borderStyle: "dashed", marginHorizontal: 8 },
   costAmount: { fontSize: 11 },
   thankYou: { marginTop: 12, marginBottom: 6 },
   termsTitle: { fontSize: 11, marginTop: 10, marginBottom: 6, fontWeight: 700 },
@@ -83,7 +96,7 @@ export default function ProposalPDF({ intake, proposal, logoUrl }: ProposalDocPr
 
         <View style={styles.costRow}>
           <Text style={styles.costLabel}>Total cost</Text>
-          <Text style={styles.costDots}>.......................................</Text>
+          <View style={styles.dashedLine} />
           <Text style={styles.costAmount}>${total}</Text>
         </View>
 
