@@ -17,7 +17,7 @@ const BOLD_FONT = georgiaUrl ? "Georgia" : "Times-Bold";
 const styles = StyleSheet.create({
   page: { padding: 32, fontSize: 10, fontFamily: BASE_FONT },
   header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 },
-  logo: { width: 160 },
+  logo: { width: 160, marginLeft: -8 },
   companyName: { fontSize: 14, marginBottom: 2 },
   smallGap: { marginTop: 6 },
   refLine: { marginTop: 16, marginBottom: 12, fontSize: 11 },
@@ -31,11 +31,11 @@ const styles = StyleSheet.create({
   costAmount: { fontSize: 11 },
   thankYou: { marginTop: 12, marginBottom: 6 },
   termsTitle: { fontSize: 11, marginTop: 10, marginBottom: 6, fontWeight: 700 },
-  footerSignatureBlock: { marginTop: 18, alignItems: "center" },
-  sigLinesRow: { flexDirection: "row", justifyContent: "space-around", marginTop: 22 },
-  sigLine: { width: 220, borderBottom: 1, borderColor: "#000" },
-  sigCaptionRow: { flexDirection: "row", justifyContent: "space-around", marginTop: 4 },
-  sigCaption: { width: 220, textAlign: "center" },
+  footerSignatureBlock: { marginTop: 18, alignItems: "flex-start" },
+  sigLinesColumn: { marginTop: 22, gap: 18 },
+  sigLineWide: { width: 360, borderBottom: 1, borderColor: "#000" },
+  sigLineNarrow: { width: 180, borderBottom: 1, borderColor: "#000" },
+  sigCaption: { marginTop: 4 },
   footer: { position: "absolute", bottom: 24, left: 32, right: 32, fontSize: 9, color: "#555", textAlign: "center" },
 });
 
@@ -120,13 +120,15 @@ export default function ProposalPDF({ intake, proposal, logoUrl }: ProposalDocPr
           <Text>Sincerely,</Text>
           <Text style={{ marginTop: 6 }}>Chris Foley</Text>
 
-          <View style={styles.sigLinesRow}>
-            <View style={styles.sigLine} />
-            <View style={styles.sigLine} />
-          </View>
-          <View style={styles.sigCaptionRow}>
-            <Text style={styles.sigCaption}>Authorization to Proceed</Text>
-            <Text style={styles.sigCaption}>Date</Text>
+          <View style={styles.sigLinesColumn}>
+            <View>
+              <View style={styles.sigLineWide} />
+              <Text style={styles.sigCaption}>Authorization to Proceed</Text>
+            </View>
+            <View>
+              <View style={styles.sigLineNarrow} />
+              <Text style={styles.sigCaption}>Date</Text>
+            </View>
           </View>
         </View>
 
