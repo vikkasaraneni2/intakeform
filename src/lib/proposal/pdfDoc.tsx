@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
   thankYou: { marginTop: 12, marginBottom: 6 },
   termsTitle: { fontSize: 11, marginTop: 10, marginBottom: 6, fontWeight: 700 },
   footerSignatureBlock: { marginTop: 18, alignItems: "flex-start" },
-  sigLinesColumn: { marginTop: 22, gap: 18 },
+  sigLinesColumn: { marginTop: 22, gap: 28 },
   sigLineWide: { width: 360, borderBottom: 1, borderColor: "#000" },
   sigLineNarrow: { width: 180, borderBottom: 1, borderColor: "#000" },
   sigCaption: { marginTop: 4 },
@@ -132,7 +132,7 @@ export default function ProposalPDF({ intake, proposal, logoUrl }: ProposalDocPr
           </View>
         </View>
 
-        <View style={styles.footer}>
+        <View fixed style={styles.footer}>
           <Text>Custom Electric • 407 Daniel Webster Hwy., Merrimack, NH 03054 • (603) 424-7557 • www.CustomElectricNH.com</Text>
         </View>
       </Page>
