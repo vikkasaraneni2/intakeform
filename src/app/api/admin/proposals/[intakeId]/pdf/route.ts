@@ -4,8 +4,8 @@ import { pdf } from "@react-pdf/renderer";
 import ProposalPDF from "@/lib/proposal/pdfDoc";
 import { put } from "@vercel/blob";
 
-export async function GET(_req: Request, { params }: { params: { intakeId: string } }) {
-  const { intakeId } = params;
+export async function GET(_req: Request, ctx: { params: Promise<{ intakeId: string }> }) {
+  const { intakeId } = await ctx.params;
   const intake = await prisma.intake.findUnique({ where: { id: intakeId } });
   const est = await prisma.equipmentEstimate.findUnique({ where: { intakeId } });
   const prop = await prisma.proposal.findFirst({ where: { intakeId }, orderBy: { version: "desc" } });

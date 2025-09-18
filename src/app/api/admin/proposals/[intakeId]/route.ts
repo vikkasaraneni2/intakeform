@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { estimateFromCounts } from "@/lib/proposal/estimate";
 
-export async function POST(req: NextRequest, { params }: { params: { intakeId: string } }) {
-  const { intakeId } = params;
+export async function POST(req: NextRequest, ctx: { params: Promise<{ intakeId: string }> }) {
+  const { intakeId } = await ctx.params;
   const body = await req.json();
   const {
     panels100A = 0,
@@ -62,8 +62,8 @@ export async function POST(req: NextRequest, { params }: { params: { intakeId: s
   return NextResponse.json({ estimate: est, proposal: { id: prop.id, proposalNo: prop.proposalNo, version: prop.version, total: prop.total } });
 }
 
-export async function GET(_req: NextRequest, { params }: { params: { intakeId: string } }) {
-  const { intakeId } = params;
+export async function GET(_req: NextRequest, ctx: { params: Promise<{ intakeId: string }> }) {
+  const { intakeId } = await ctx.params;
   const est = await prisma.equipmentEstimate.findUnique({ where: { intakeId } });
   const prop = await prisma.proposal.findFirst({ where: { intakeId }, orderBy: { version: "desc" } });
   return NextResponse.json({ estimate: est, proposal: prop });
