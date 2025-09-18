@@ -13,8 +13,8 @@ export async function GET(_req: Request, ctx: { params: Promise<{ intakeId: stri
   const doc = ProposalPDF({ intake, proposal: prop });
   // Render to Buffer and return as ArrayBuffer to satisfy BodyInit in Node
   const buf = await ReactPDF.renderToBuffer(doc);
-  const ab = buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
-  return new Response(ab, { headers: { "Content-Type": "application/pdf", "Cache-Control": "no-store" } });
+  const u8 = new Uint8Array(buf);
+  return new Response(u8, { headers: { "Content-Type": "application/pdf", "Cache-Control": "no-store" } });
 }
 
 export const runtime = 'nodejs';
