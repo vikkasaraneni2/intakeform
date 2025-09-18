@@ -11,10 +11,11 @@ export async function GET(_req: Request, ctx: { params: Promise<{ intakeId: stri
   if (!intake || !est || !prop) return NextResponse.json({ error: "Missing data" }, { status: 404 });
 
   const doc = ProposalPDF({ intake, proposal: prop });
-  // Use Blob/ArrayBuffer to satisfy BodyInit typing across runtimes
-  const fileBuf: unknown = await (pdf(doc) as any).toBuffer();
-  const blob = new Blob([fileBuf as ArrayBufferLike], { type: "application/pdf" });
-  return new Response(blob, { headers: { "Content-Type": "application/pdf", "Cache-Control": "no-store" } });
+  // Get a typed buffer and convert to ArrayBuffer for Response BodyInit
+  const out = pdf(doc) as { toBuffer(): Promise<Uint8Array> };
+  const buf = await out.toBuffer();
+  const ab = buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
+  return new Response(ab, { headers: { "Content-Type": "application/pdf", "Cache-Control": "no-store" } });
 }
 
 export const runtime = 'nodejs';
