@@ -85,7 +85,7 @@ export default function ProposalEditor({ intakeId }: Props) {
     return (
       <label className="text-sm">
         <div className="text-neutral-600">{label}</div>
-        <input type="number" step={step} value={(form as any)[key] as number} onChange={(e)=> setForm({ ...form, [key]: Number(e.target.value || 0) })} className="mt-1 w-full rounded-md border p-2" />
+        <input type="number" step={step} value={Number(form[key])} onChange={(e)=> setForm({ ...form, [key]: Number(e.target.value || 0) })} className="mt-1 w-full rounded-md border p-2" />
       </label>
     );
   }

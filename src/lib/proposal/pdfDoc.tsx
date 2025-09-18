@@ -12,7 +12,9 @@ const styles = StyleSheet.create({
   footer: { position: "absolute", bottom: 24, left: 32, right: 32, fontSize: 10, color: "#555" },
 });
 
-export default function ProposalPDF({ intake, estimate, proposal }: any) {
+type ProposalDocProps = { intake: any; estimate: any; proposal: any };
+
+export default function ProposalPDF({ intake, estimate, proposal }: ProposalDocProps) {
   const client = {
     name: intake.company,
     address: intake.siteAddress,
@@ -23,7 +25,7 @@ export default function ProposalPDF({ intake, estimate, proposal }: any) {
     <Document>
       <Page size="LETTER" style={styles.page}>
         <View style={styles.header}>
-          <Image style={styles.logo} src="/cec-logo.png" />
+          <Image style={styles.logo} src="/cec-logo.png" alt="CEC" />
           <View>
             <Text>Proposal #{proposal.proposalNo}</Text>
             <Text>{new Date().toLocaleDateString()}</Text>

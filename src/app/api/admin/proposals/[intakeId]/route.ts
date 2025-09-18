@@ -48,7 +48,7 @@ export async function POST(req: NextRequest, { params }: { params: { intakeId: s
 
   // Ensure a draft proposal row exists
   const existing = await prisma.proposal.findFirst({ where: { intakeId }, orderBy: { version: "desc" } });
-  let proposalNo = existing?.proposalNo || `P-${intakeId.slice(-6).toUpperCase()}`;
+  const proposalNo = existing?.proposalNo || `P-${intakeId.slice(-6).toUpperCase()}`;
   const version = existing ? existing.version : 1;
   const prop = await prisma.proposal.upsert({
     where: existing ? { intakeId_version: { intakeId, version } } : { id: "__create__" },
